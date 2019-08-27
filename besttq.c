@@ -2,6 +2,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*
+https://www.jianshu.com/p/65360b500ad9
+
+Process 2 first becomes ready to run 480usecs after the computer reboots.
+After it has spent a total of 8000usecs on the CPU it makes its first I/O request.
+After it has spent a total of 8005usecs on the CPU it exits.
+
+Processes can only *request* an I/O operation when they're Running (on CPU), they then enter the 
+appropriate queue for the required device, and may be blocked in the queue waiting for other process 
+using/waiting for the databus as well.
+*/
+
 /* CITS2002 Project 1 2019
    Name(s):             Haoran zhang (, student-name2)
    Student number(s):   22289211 (, student-number-2)
@@ -41,6 +53,12 @@ int total_process_completion_time       = 0;
 #define CHAR_COMMENT            '#'
 #define MAXWORD                 20
 
+//  ----------------------------------------------------------------------
+
+char deviceName[MAX_DEVICES][MAX_DEVICE_NAME];
+int deviceRate[MAX_DEVICES];
+int n=0;
+
 void parse_tracefile(char program[], char tracefile[])
 {
 //  ATTEMPT TO OPEN OUR TRACEFILE, REPORTING AN ERROR IF WE CAN'T
@@ -59,11 +77,13 @@ void parse_tracefile(char program[], char tracefile[])
         ++lc;
 
 //  COMMENT LINES ARE SIMPLY SKIPPED
+//  #define CHAR_COMMENT            '#'
         if(line[0] == CHAR_COMMENT) {
             continue;
         }
 
 //  ATTEMPT TO BREAK EACH LINE INTO A NUMBER OF WORDS, USING sscanf()
+//如果成功，该函数返回成功匹配和赋值的个数。如果到达文件末尾或发生读错误，则返回 EOF。
         char    word0[MAXWORD], word1[MAXWORD], word2[MAXWORD], word3[MAXWORD];
         int nwords = sscanf(line, "%s %s %s %s", word0, word1, word2, word3);
 
@@ -75,11 +95,16 @@ void parse_tracefile(char program[], char tracefile[])
         }
 //  LOOK FOR LINES DEFINING DEVICES, PROCESSES, AND PROCESS EVENTS
         if(nwords == 4 && strcmp(word0, "device") == 0) {
-            ;   // FOUND A DEVICE DEFINITION, WE'LL NEED TO STORE THIS SOMEWHERE
+           // FOUND A DEVICE DEFINITION, WE'LL NEED TO STORE THIS SOMEWHERE
+           for(int i = 0;i<MAXWORD;i++){
+              deviceName[n][i]=word1[i];   
+           }
+           deviceRate[n]=atoi(word2);
+           n++;
         }
 
         else if(nwords == 1 && strcmp(word0, "reboot") == 0) {
-            ;   // NOTHING REALLY REQUIRED, DEVICE DEFINITIONS HAVE FINISHED
+            continue;   // NOTHING REALLY REQUIRED, DEVICE DEFINITIONS HAVE FINISHED
         }
 
         else if(nwords == 4 && strcmp(word0, "process") == 0) {
@@ -138,6 +163,7 @@ int main(int argcount, char *argvalue[])
 
         if(TQ0 < 1 || TQfinal < TQ0 || TQinc < 1) {
             usage(argvalue[0]);
+           //fail
         }
     }
 //  CALLED WITH THE PROVIDED TRACEFILE (NAME) AND ONE TIME VALUE
