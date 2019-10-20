@@ -1,0 +1,23 @@
+
+THE CODE FOR
+    sifs-internal.h
+    mkvolume.c
+    perror.c
+HAS BEEN PROVIDED FOR YOU;  UNDERSTAND IT, BUT DON'T CHANGE IT.
+
+
+YOU WILL NEED TO COMPLETE THE API IMPLEMENTATIONS OF:
+    mkdir.c
+    dirinfo.c
+    rmdir.c
+
+    writefile.c
+    readfile.c
+    fileinfo.c
+    rmfile.c
+
+
+YOU DO NOT NEED TO UNDERSTAND THE MD5 IMPLEMENTATION IN:
+    md5.c
+BUT SHOULD UNDERSTAND HOW TO USE THE FUNCTIONS IN:
+    md5.h
